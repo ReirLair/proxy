@@ -11,20 +11,23 @@ const app = express();
 const proxy = httpProxy.createProxyServer({
     changeOrigin: true,
     ws: true,
-    secure: process.env.NODE_ENV !== 'development',
+    secure: process.env.NODE_ENV !== 'development', // Disable SSL verification in development
     followRedirects: true,
 });
 
+// Middleware
 app.use(helmet());
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
+// Rate limiting
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests
 });
 app.use(limiter);
 
+// Custom headers for obfuscation
 app.use((req, res, next) => {
     req.headers['user-agent'] = new userAgent().toString();
     delete req.headers['x-whatsapp-client'];
@@ -36,6 +39,7 @@ app.use((req, res, next) => {
     next();
 });
 
+// Proxy HTTP requests
 app.use('/', (req, res) => {
     const targetUrl = req.query.url || req.body.url;
 
@@ -57,6 +61,7 @@ app.use('/', (req, res) => {
     });
 });
 
+// Handle WebSocket upgrades
 app.on('upgrade', (req, socket, head) => {
     const parsed = url.parse(req.url, true);
     const targetUrl = parsed.query.url;
@@ -66,7 +71,7 @@ app.on('upgrade', (req, socket, head) => {
         return;
     }
 
-    console.log(`[${new Date().toISOString()}] Upgrading to WebSocket for ${targetUrl}`);
+    console.log(`[${new Date().toISOString()}] Upgrading to WebSocket [${req.headers['x-request-id']}]`);
 
     proxy.ws(req, socket, head, { target: targetUrl }, (err) => {
         console.error(`[${new Date().toISOString()}] WebSocket proxy error: ${err.message}`);
@@ -74,6 +79,7 @@ app.on('upgrade', (req, socket, head) => {
     });
 });
 
+// Proxy error handling
 proxy.on('error', (err, req, res) => {
     console.error(`[${new Date().toISOString()}] Proxy error: ${err.message}`);
     if (res.write) {
@@ -84,11 +90,13 @@ proxy.on('error', (err, req, res) => {
     }
 });
 
+// Start server
 const PORT = process.env.PORT || 7860;
 app.listen(PORT, () => {
     console.log(`[${new Date().toISOString()}] Proxy server running on port ${PORT}`);
 });
 
+// Handle graceful shutdown
 process.on('SIGTERM', () => {
     console.log('Shutting down proxy server...');
     proxy.close();
