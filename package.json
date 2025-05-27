@@ -1,0 +1,19 @@
+{
+  "name": "hf-reverse-proxy",
+  "version": "1.0.0",
+  "description": "Reverse proxy server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.19.2",
+    "http-proxy-middleware": "^2.0.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "author": "Reiker",
+  "license": "MIT"
+}
