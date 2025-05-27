@@ -4,14 +4,14 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const userAgent = require('user-agents');
-const crypto = require('crypto');
+const crypto = require('crypto'); // Added missing import
 const url = require('url');
 
 const app = express();
 const proxy = httpProxy.createProxyServer({
     changeOrigin: true,
     ws: true,
-    secure: process.env.NODE_ENV !== 'development', // Disable SSL verification in development
+    secure: process.env.NODE_ENV !== 'development',
     followRedirects: true,
 });
 
@@ -22,8 +22,8 @@ app.use(express.json());
 
 // Rate limiting
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests
+    windowMs: 15 * 60 * 1000,
+    max: 100,
 });
 app.use(limiter);
 
