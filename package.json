@@ -2,9 +2,9 @@
   "name": "hf-reverse-proxy",
   "version": "1.0.0",
   "description": "A secure reverse proxy server for WhatsApp traffic with WebSocket support and obfuscation",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -14,7 +14,9 @@
     "helmet": "^7.0.0",
     "http-proxy": "^1.18.1",
     "http-proxy-middleware": "^2.0.6",
-    "user-agents": "^1.0.127"
+    "user-agents": "^1.0.127",
+    "crypto": "^1.0.1",
+    "url": "^0.11.0"
   },
   "engines": {
     "node": ">=14.0.0"
